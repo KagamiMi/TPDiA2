@@ -10,22 +10,19 @@ import java.util.Date;
 
 
 public class CoreClass {
-	int portNumber = 7;
+	static int portNumber = 7;
 	
 	public static void main(String args[]) throws ClassNotFoundException {
-		try (
-				ServerSocket ss = new ServerSocket(7);
-				Socket cs = ss.accept();
-				
-				ObjectOutputStream os = new ObjectOutputStream(cs.getOutputStream());
-				ObjectInputStream is = new ObjectInputStream(cs.getInputStream());
-				) 
+		try
 		{
-			System.out.println("connected");
+			ServerSocket ss = new ServerSocket(portNumber,10);
+			System.out.println("created socket server ");
 			while (true) {
-				NozzleMeasure temp = (NozzleMeasure)is.readObject();
-				System.out.println(temp.date + " " + temp.locationId + " " + temp.gunId + " " + temp.tankId
-						+ " "+ temp.literCounter + " " + temp.totalCounter + " " + temp.status);
+				Socket cs = ss.accept();
+				System.out.println("Connected to new client");
+				ObjectInputStream is = new ObjectInputStream(cs.getInputStream());
+				new SocketHandler(is).start();
+				System.out.println("New thread running!");
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
